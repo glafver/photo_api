@@ -12,9 +12,8 @@ const index = async(req, res) => {
 
     res.send({
         status: 'success',
-        data: {
-            albums: req.user.related('albums'),
-        },
+        data: req.user.related('albums'),
+
     });
 }
 
@@ -24,8 +23,8 @@ const index = async(req, res) => {
  * GET /:albumId
  */
 const show = async(req, res) => {
-    await req.user.load('albums');
-    const album = await new models.Album({ id: req.params.albumId }).fetch({ require: false, withRelated: ['photos'] });
+
+    const album = await new models.Album({ id: req.params.albumId, user_id: req.user.id }).fetch({ require: false, withRelated: ['photos'] });
 
     // make sure album exists
     if (!album) {
@@ -39,7 +38,9 @@ const show = async(req, res) => {
 
     res.send({
         status: 'success',
-        data: album,
+        data: {
+            album
+        }
     });
 }
 
@@ -84,7 +85,7 @@ const store = async(req, res) => {
 const update = async(req, res) => {
 
     // make sure album exists
-    const album = await new models.Album({ id: req.params.albumId }).fetch({ require: false });
+    const album = await new models.Album({ id: req.params.albumId, user_id: req.user.id }).fetch({ require: false });
     if (!album) {
         debug("Album to update was not found.");
         res.status(404).send({
@@ -119,6 +120,78 @@ const update = async(req, res) => {
     }
 }
 
+const addPhoto = async(req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).send({ status: 'fail', data: errors.array() });
+    }
+
+    // make sure album exists for this user
+
+    // await req.user.load('albums');
+    // const albums = req.user.related('albums');
+    // const album = albums.find(album => album.id == req.params.albumId);
+
+    const album = await new models.Album({ id: req.params.albumId, user_id: req.user.id }).fetch({ require: false });
+
+    if (!album) {
+        debug("Album to update was not found.");
+        res.status(404).send({
+            status: 'fail',
+            data: 'Album Not Found',
+        });
+        return;
+    }
+
+    const validData = matchedData(req);
+    debug(validData)
+
+    // make sure photo exists for this user
+    await req.user.load('photos');
+    const photos = req.user.related('photos');
+    const photo = photos.find(photo => photo.id == validData.photo_id);
+
+    if (!photo) {
+        debug("Photo to update was not found.");
+        res.status(404).send({
+            status: 'fail',
+            data: 'Photo Not Found',
+        });
+        return;
+    }
+
+    // make sure this album does not already have this photo
+    await album.load('photos');
+    const photo_in_album = album.related('photos').find(photo => photo.id == validData.photo_id);
+    if (photo_in_album) {
+        return res.send({
+            status: 'fail',
+            data: 'Photo already exists in this album.',
+        });
+    }
+
+    try {
+        album.photos().attach(validData.photo_id);
+        debug("A new photo was succsess fully added to album");
+
+        res.send({
+            status: 'success',
+            data: null,
+        });
+
+    } catch (error) {
+        res.status(500).send({
+            status: 'error',
+            message: 'Exception thrown in database when adding a photo to an album.',
+        });
+        throw error;
+    }
+
+}
+
+
+
+
 /**
  * Destroy a specific resource
  *
@@ -136,5 +209,6 @@ module.exports = {
     show,
     store,
     update,
+    addPhoto,
     // destroy,
 }

@@ -15,4 +15,10 @@ const albumValidationRules = [
     }),
 ];
 
-module.exports = { albumValidationRules };
+// photo_id integer required must be an existing photo id
+
+const addPhotoRules = [
+    body('photo_id').exists().isInt({ min: 1 })
+];
+
+module.exports = { albumValidationRules, addPhotoRules };

@@ -12,6 +12,8 @@ router.post('/', albumValidationRules.albumValidationRules, albumController.stor
 
 router.put('/:albumId', albumValidationRules.albumValidationRules, albumController.update);
 
+router.post('/:albumId/photos', albumValidationRules.addPhotoRules, albumController.addPhoto);
+
 // router.delete('/:albumId', albumController.destroy);
 
 
