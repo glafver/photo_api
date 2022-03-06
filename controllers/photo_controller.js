@@ -34,23 +34,23 @@ const show = async(req, res) => {
 }
 
 /**
- * Store a new resource
+ * Store a new photo
  *
  * POST /
  */
 const store = async(req, res) => {
-    // check for any validation errors
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).send({ status: 'fail', data: errors.array() });
     }
 
-    // get only the validated data from the request
     const validData = matchedData(req);
+    validData.user_id = req.user.id
 
     try {
-        const photo = await new models.photo(validData).save();
-        debug("Created new photo successfully: %O", photo);
+        const photo = await new models.Photo(validData).save();
+        debug("New photo %o successfully created", photo.id);
 
         res.send({
             status: 'success',

@@ -28,6 +28,9 @@ const show = async(req, res) => {
     const album = await new models.Album({ id: req.params.albumId })
         .fetch({ withRelated: ['photos'] });
 
+
+    debug(album)
+    debug(album.title)
     res.send({
         status: 'success',
         data: album,
@@ -35,23 +38,23 @@ const show = async(req, res) => {
 }
 
 /**
- * Store a new resource
+ * Store a new album
  *
  * POST /
  */
 const store = async(req, res) => {
-    // check for any validation errors
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).send({ status: 'fail', data: errors.array() });
     }
 
-    // get only the validated data from the request
     const validData = matchedData(req);
+    validData.user_id = req.user.id
 
     try {
-        const album = await new models.album(validData).save();
-        debug("Created new album successfully: %O", album);
+        const album = await new models.Album(validData).save();
+        debug("New album %o successfully created", album.id);
 
         res.send({
             status: 'success',
@@ -128,7 +131,7 @@ const store = async(req, res) => {
 module.exports = {
     index,
     show,
-    // store,
+    store,
     // update,
     // destroy,
 }
