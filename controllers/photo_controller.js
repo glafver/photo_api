@@ -24,8 +24,18 @@ const index = async(req, res) => {
  * GET /:photoId
  */
 const show = async(req, res) => {
-    const photo = await new models.Photo({ id: req.params.photoId })
-        .fetch();
+
+    const photo = await new models.Photo({ id: req.params.photoId }).fetch({ require: false });
+
+    // make sure photo exists
+    if (!photo) {
+        debug("Photo was not found.");
+        res.status(404).send({
+            status: 'fail',
+            data: 'Photo Not Found',
+        });
+        return;
+    }
 
     res.send({
         status: 'success',
@@ -72,35 +82,32 @@ const store = async(req, res) => {
  * PUT /:photoId
  */
 const update = async(req, res) => {
-    const photoId = req.params.photoId;
 
     // make sure photo exists
-    const photo = await new models.photo({ id: photoId }).fetch({ require: false });
+    const photo = await new models.Photo({ id: req.params.photoId }).fetch({ require: false });
     if (!photo) {
-        debug("photo to update was not found. %o", { id: photoId });
+        debug("Photo to update was not found.");
         res.status(404).send({
             status: 'fail',
-            data: 'photo Not Found',
+            data: 'Photo Not Found',
         });
         return;
     }
 
-    // check for any validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).send({ status: 'fail', data: errors.array() });
     }
 
-    // get only the validated data from the request
     const validData = matchedData(req);
 
     try {
-        const updatedphoto = await photo.save(validData);
-        debug("Updated photo successfully: %O", updatedphoto);
+        const updatedPhoto = await photo.save(validData);
+        debug("Photo %O successfully updated", updatedPhoto.id);
 
         res.send({
             status: 'success',
-            data: photo,
+            data: updatedPhoto,
         });
 
     } catch (error) {
@@ -117,12 +124,12 @@ const update = async(req, res) => {
  *
  * DELETE /:photoId
  */
-const destroy = (req, res) => {
-    res.status(400).send({
-        status: 'fail',
-        message: 'You need to write the code for deleting this resource yourself.',
-    });
-}
+// const destroy = (req, res) => {
+//     res.status(400).send({
+//         status: 'fail',
+//         message: 'You need to write the code for deleting this resource yourself.',
+//     });
+// }
 
 
 module.exports = {
@@ -130,5 +137,5 @@ module.exports = {
     show,
     store,
     update,
-    destroy,
+    // destroy,
 }

@@ -11,4 +11,10 @@ const createRules = [
     body('comment').optional().isString().trim().isLength({ min: 3 }),
 ];
 
-module.exports = { createRules };
+const updateRules = [
+    body('title').optional().isString().trim().isLength({ min: 3 }),
+    body('url').optional().isURL().trim().isLength({ min: 3 }),
+    body('comment').optional().isString().trim().isLength({ min: 3 }),
+];
+
+module.exports = { createRules, updateRules };

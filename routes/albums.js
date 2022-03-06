@@ -10,7 +10,7 @@ router.get('/:albumId', albumController.show);
 
 router.post('/', albumValidationRules.albumValidationRules, albumController.store);
 
-// router.put('/:albumId', albumValidationRules.updateRules, albumController.update);
+router.put('/:albumId', albumValidationRules.albumValidationRules, albumController.update);
 
 // router.delete('/:albumId', albumController.destroy);
 

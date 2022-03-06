@@ -5,7 +5,10 @@ const userValidationRules = require('../validation/user')
 const auth = require('../middlewares/auth');
 
 router.get('/', (req, res) => {
-    res.send({ status: 'success' });
+    res.send({
+        status: 'success',
+        message: 'Hello from a photo app! You need to create an account or log in to get started.'
+    });
 });
 
 router.use('/albums', auth.basic, require('./albums'));

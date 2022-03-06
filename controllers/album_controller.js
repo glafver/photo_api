@@ -25,12 +25,18 @@ const index = async(req, res) => {
  */
 const show = async(req, res) => {
     await req.user.load('albums');
-    const album = await new models.Album({ id: req.params.albumId })
-        .fetch({ withRelated: ['photos'] });
+    const album = await new models.Album({ id: req.params.albumId }).fetch({ require: false, withRelated: ['photos'] });
 
+    // make sure album exists
+    if (!album) {
+        debug("Album was not found.");
+        res.status(404).send({
+            status: 'fail',
+            data: 'Album Not Found',
+        });
+        return;
+    }
 
-    debug(album)
-    debug(album.title)
     res.send({
         status: 'success',
         data: album,
@@ -71,50 +77,47 @@ const store = async(req, res) => {
 }
 
 /**
- * Update a specific resource
+ * Update a specific album
  *
  * PUT /:albumId
  */
-// const update = async(req, res) => {
-//     const albumId = req.params.albumId;
+const update = async(req, res) => {
 
-//     // make sure album exists
-//     const album = await new models.album({ id: albumId }).fetch({ require: false });
-//     if (!album) {
-//         debug("album to update was not found. %o", { id: albumId });
-//         res.status(404).send({
-//             status: 'fail',
-//             data: 'album Not Found',
-//         });
-//         return;
-//     }
+    // make sure album exists
+    const album = await new models.Album({ id: req.params.albumId }).fetch({ require: false });
+    if (!album) {
+        debug("Album to update was not found.");
+        res.status(404).send({
+            status: 'fail',
+            data: 'Album Not Found',
+        });
+        return;
+    }
 
-//     // check for any validation errors
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//         return res.status(422).send({ status: 'fail', data: errors.array() });
-//     }
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).send({ status: 'fail', data: errors.array() });
+    }
 
-//     // get only the validated data from the request
-//     const validData = matchedData(req);
+    const validData = matchedData(req);
 
-//     try {
-//         const updatedalbum = await album.save(validData);
-//         debug("Updated album successfully: %O", updatedalbum);
+    try {
+        const updatedAlbum = await album.save(validData);
+        debug("Album %O successfully updated", updatedAlbum.id);
 
-//         res.send({
-//             status: 'success',
-//             data: album,
-//         });
+        res.send({
+            status: 'success',
+            data: updatedAlbum,
+        });
 
-//     } catch (error) {
-//         res.status(500).send({
-//             status: 'error',
-//             message: 'Exception thrown in database when updating a new album.',
-//         });
-//         throw error;
-//     }
-// }
+    } catch (error) {
+        res.status(500).send({
+            status: 'error',
+            message: 'Exception thrown in database when updating a new album.',
+        });
+        throw error;
+    }
+}
 
 /**
  * Destroy a specific resource
@@ -132,6 +135,6 @@ module.exports = {
     index,
     show,
     store,
-    // update,
+    update,
     // destroy,
 }
