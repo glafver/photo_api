@@ -1,36 +1,37 @@
-const debug = require('debug')('photo_app:user_controller');
+const debug = require('debug')('photo_app:auth_controller');
 const { matchedData, validationResult } = require('express-validator');
 const models = require('../models');
 const bcrypt = require('bcrypt');
 
-/**
- * Get all users
- *
- * GET /
- */
-const index = async(req, res) => {
-    const users = await models.User.fetchAll();
+// /**
+//  * Get all users
+//  *
+//  * GET /
+//  */
+// const index = async(req, res) => {
+//     const users = await models.User.fetchAll();
 
-    res.send({
-        status: 'success',
-        data: users,
-    });
-}
+//     res.send({
+//         status: 'success',
+//         data: users,
+//     });
+// }
 
-/**
- * Get a specific user
- *
- * GET /:userId
- */
-const show = async(req, res) => {
-    const user = await new models.User({ id: req.params.userId })
-        .fetch({ withRelated: ['albums', 'photos'] });
+// /**
+//  * Get a specific user
+//  *
+//  * GET /:userId
+//  */
+// const show = async(req, res) => {
+//     const user = await new models.User({ id: req.params.userId })
+//         .fetch({ withRelated: ['albums', 'photos'] });
 
-    res.send({
-        status: 'success',
-        data: user,
-    });
-}
+//     res.send({
+//         status: 'success',
+//         data: user,
+//     });
+// }
+
 
 /**
  * Register a new user
@@ -81,7 +82,5 @@ const register = async(req, res) => {
 
 
 module.exports = {
-    index,
-    show,
     register
 }
