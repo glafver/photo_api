@@ -24,9 +24,10 @@ const index = async(req, res) => {
  */
 const show = async(req, res) => {
 
+    // make sure photo exists and it belongs to the user
+
     const photo = await new models.Photo({ id: req.params.photoId, user_id: req.user.id }).fetch({ require: false });
 
-    // make sure photo exists
     if (!photo) {
         debug("Photo was not found.");
         res.status(404).send({
@@ -82,7 +83,7 @@ const store = async(req, res) => {
  */
 const update = async(req, res) => {
 
-    // make sure photo exists
+    // make sure photo exists and it belongs to the user
     const photo = await new models.Photo({ id: req.params.photoId, user_id: req.user.id }).fetch({ require: false });
     if (!photo) {
         debug("Photo to update was not found.");
@@ -112,23 +113,11 @@ const update = async(req, res) => {
     } catch (error) {
         res.status(500).send({
             status: 'error',
-            message: 'Exception thrown in database when updating a new photo.',
+            message: 'Exception thrown in database when updating a photo.',
         });
         throw error;
     }
 }
-
-/**
- * Destroy a specific resource
- *
- * DELETE /:photoId
- */
-// const destroy = (req, res) => {
-//     res.status(400).send({
-//         status: 'fail',
-//         message: 'You need to write the code for deleting this resource yourself.',
-//     });
-// }
 
 
 module.exports = {
@@ -136,5 +125,4 @@ module.exports = {
     show,
     store,
     update,
-    // destroy,
 }

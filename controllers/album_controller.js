@@ -26,7 +26,7 @@ const show = async(req, res) => {
 
     const album = await new models.Album({ id: req.params.albumId, user_id: req.user.id }).fetch({ require: false, withRelated: ['photos'] });
 
-    // make sure album exists
+    // make sure album exists and it belongs to the user
     if (!album) {
         debug("Album was not found.");
         res.status(404).send({
@@ -84,7 +84,7 @@ const store = async(req, res) => {
  */
 const update = async(req, res) => {
 
-    // make sure album exists
+    // make sure album exists and it belongs to the user
     const album = await new models.Album({ id: req.params.albumId, user_id: req.user.id }).fetch({ require: false });
     if (!album) {
         debug("Album to update was not found.");
@@ -114,7 +114,7 @@ const update = async(req, res) => {
     } catch (error) {
         res.status(500).send({
             status: 'error',
-            message: 'Exception thrown in database when updating a new album.',
+            message: 'Exception thrown in database when updating an album.',
         });
         throw error;
     }
@@ -126,7 +126,7 @@ const addPhoto = async(req, res) => {
         return res.status(422).send({ status: 'fail', data: errors.array() });
     }
 
-    // make sure album exists for this user
+    // make sure album exists and it belongs to the user
 
     // await req.user.load('albums');
     // const albums = req.user.related('albums');
@@ -190,25 +190,10 @@ const addPhoto = async(req, res) => {
 }
 
 
-
-
-/**
- * Destroy a specific resource
- *
- * DELETE /:albumId
- */
-// const destroy = (req, res) => {
-//     res.status(400).send({
-//         status: 'fail',
-//         message: 'You need to write the code for deleting this resource yourself.',
-//     });
-// }
-
 module.exports = {
     index,
     show,
     store,
     update,
     addPhoto,
-    // destroy,
 }
