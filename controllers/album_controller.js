@@ -128,11 +128,12 @@ const addPhoto = async(req, res) => {
 
     // make sure album exists for this user
 
-    // await req.user.load('albums');
-    // const albums = req.user.related('albums');
-    // const album = albums.find(album => album.id == req.params.albumId);
-
     const album = await new models.Album({ id: req.params.albumId, user_id: req.user.id }).fetch({ require: false });
+    await album.load('photos');
+
+    await req.user.load('photos');
+    const photos = req.user.related('photos');
+
 
     if (!album) {
         debug("Album to update was not found.");
@@ -144,50 +145,94 @@ const addPhoto = async(req, res) => {
     }
 
     const validData = matchedData(req);
-    debug(validData)
+    var check = false;
 
-    // make sure photo exists for this user
-    await req.user.load('photos');
-    const photos = req.user.related('photos');
-    const photo = photos.find(photo => photo.id == validData.photo_id);
+    // make sure photos are avialiable for this user
 
-    if (!photo) {
-        debug("Photo to update was not found.");
-        res.status(404).send({
+    validData.photo_id.forEach(async element => {
+        const photo = photos.find(photo => photo.id == element);
+        if (!photo) {
+            check = true;
+            return;
+        }
+    })
+
+    if (check) {
+        debug("User has no rights to attach these photos");
+        res.status(403).send({
             status: 'fail',
-            data: 'Photo Not Found',
+            data: "Not permitted to attach these photos",
         });
         return;
     }
 
-    // make sure this album does not already have this photo
-    await album.load('photos');
-    const photo_in_album = album.related('photos').find(photo => photo.id == validData.photo_id);
-    if (photo_in_album) {
-        return res.send({
+    // make sure this album does not already have these photos
+
+    validData.photo_id.forEach(async element => {
+        const photo_in_album = album.related('photos').find(photo => photo.id == element);
+        if (photo_in_album) {
+            check = true;
+            return;
+        }
+    })
+
+    if (check) {
+        res.status(403).send({
             status: 'fail',
-            data: 'Photo already exists in this album.',
+            data: 'Photos already exist in album',
         });
+        return;
     }
 
     try {
+
         album.photos().attach(validData.photo_id);
-        debug("A new photo was succsess fully added to album");
+        debug("New photos were succsessfully added to album");
 
         res.send({
             status: 'success',
             data: null,
         });
 
-    } catch (error) {
+    } catch (err) {
+        debug(err)
         res.status(500).send({
             status: 'error',
-            message: 'Exception thrown in database when adding a photo to an album.',
+            message: 'Exception thrown in database when adding photos to an album.',
         });
-        throw error;
+        throw err;
     }
 
+};
+
+const deletePhoto = async(req, res) => {
+    try {
+        let album = await new models.Album({ id: req.params.albumId, user_id: req.user.id })
+            .fetch({ require: false, withRelated: ['photos'] });
+        if (!album) {
+            debug("Album to update was not found.");
+            res.status(404).send({
+                status: 'fail',
+                data: 'Album Not Found',
+            });
+            return;
+        }
+
+        album.photos().detach(req.params.photoId);
+
+        return res.status(200).send({
+            status: 'success',
+            data: null
+        });
+
+    } catch (err) {
+        return res.status(500).send({
+            status: 'error',
+            data: 'Exception thrown in database when deleting a photo from the album.',
+        });
+    }
 }
+
 
 /**
  * Destroy a specific album
@@ -232,5 +277,6 @@ module.exports = {
     store,
     update,
     addPhoto,
+    deletePhoto,
     destroy
 }
