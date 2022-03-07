@@ -189,20 +189,42 @@ const addPhoto = async(req, res) => {
 
 }
 
-
-
-
 /**
- * Destroy a specific resource
+ * Destroy a specific album
  *
  * DELETE /:albumId
  */
-// const destroy = (req, res) => {
-//     res.status(400).send({
-//         status: 'fail',
-//         message: 'You need to write the code for deleting this resource yourself.',
-//     });
-// }
+
+const destroy = async(req, res) => {
+
+    try {
+        let album = await new models.Album({ id: req.params.albumId, user_id: req.user.id })
+            .fetch({ require: false, withRelated: ['photos'] });
+        if (!album) {
+            debug("Album to update was not found.");
+            res.status(404).send({
+                status: 'fail',
+                data: 'Album Not Found',
+            });
+            return;
+        }
+
+        album.photos().detach();
+
+        album = await album.destroy();
+
+        return res.status(200).send({
+            status: 'success',
+            data: null
+        });
+
+    } catch (err) {
+        return res.status(500).send({
+            status: 'error',
+            data: 'Exception thrown in database when deleting an album.',
+        });
+    }
+}
 
 module.exports = {
     index,
@@ -210,5 +232,5 @@ module.exports = {
     store,
     update,
     addPhoto,
-    // destroy,
+    destroy
 }

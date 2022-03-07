@@ -1,5 +1,6 @@
 const debug = require('debug')('photo_app:photo_controller');
 const { matchedData, validationResult } = require('express-validator');
+const { Photo } = require('../models');
 const models = require('../models');
 
 /**
@@ -112,7 +113,7 @@ const update = async(req, res) => {
     } catch (error) {
         res.status(500).send({
             status: 'error',
-            message: 'Exception thrown in database when updating a new photo.',
+            message: 'Exception thrown in database when updating a photo.',
         });
         throw error;
     }
@@ -123,12 +124,38 @@ const update = async(req, res) => {
  *
  * DELETE /:photoId
  */
-// const destroy = (req, res) => {
-//     res.status(400).send({
-//         status: 'fail',
-//         message: 'You need to write the code for deleting this resource yourself.',
-//     });
-// }
+
+const destroy = async(req, res) => {
+
+    try {
+        let photo = await new models.Photo({ id: req.params.photoId, user_id: req.user.id })
+            .fetch({ require: false, withRelated: ['albums'] });
+        if (!photo) {
+            debug("Photo to update was not found.");
+            res.status(404).send({
+                status: 'fail',
+                data: 'Photo Not Found',
+            });
+            return;
+        }
+
+        photo.albums().detach();
+
+        photo = await photo.destroy();
+
+        return res.status(200).send({
+            status: 'success',
+            data: null
+        });
+
+    } catch (err) {
+        debug(err)
+        return res.status(500).send({
+            status: 'error',
+            data: 'Exception thrown in database when deleting a photo.',
+        });
+    }
+}
 
 
 module.exports = {
@@ -136,5 +163,5 @@ module.exports = {
     show,
     store,
     update,
-    // destroy,
+    destroy
 }
