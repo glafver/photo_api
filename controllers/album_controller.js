@@ -127,11 +127,6 @@ const addPhoto = async(req, res) => {
     }
 
     // make sure album exists and it belongs to the user
-
-    // await req.user.load('albums');
-    // const albums = req.user.related('albums');
-    // const album = albums.find(album => album.id == req.params.albumId);
-
     const album = await new models.Album({ id: req.params.albumId, user_id: req.user.id }).fetch({ require: false });
 
     if (!album) {
@@ -172,7 +167,7 @@ const addPhoto = async(req, res) => {
 
     try {
         album.photos().attach(validData.photo_id);
-        debug("A new photo was succsess fully added to album");
+        debug("A new photo was succsessfully added to album");
 
         res.send({
             status: 'success',
