@@ -25,7 +25,8 @@ const index = async(req, res) => {
  */
 const show = async(req, res) => {
 
-    const photo = await new models.Photo({ id: req.params.photoId, user_id: req.user.id }).fetch({ require: false });
+    const photo = await new models.Photo({ id: req.params.photoId, user_id: req.user.id })
+        .fetch({ require: false });
 
     // make sure photo exists
     if (!photo) {
@@ -84,7 +85,8 @@ const store = async(req, res) => {
 const update = async(req, res) => {
 
     // make sure photo exists
-    const photo = await new models.Photo({ id: req.params.photoId, user_id: req.user.id }).fetch({ require: false });
+    const photo = await new models.Photo({ id: req.params.photoId, user_id: req.user.id })
+        .fetch({ require: false });
     if (!photo) {
         debug("Photo to update was not found.");
         res.status(404).send({

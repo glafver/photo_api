@@ -8,6 +8,7 @@ const models = require('../models');
  * GET /
  */
 const index = async(req, res) => {
+
     await req.user.load('albums');
 
     res.send({
@@ -24,7 +25,8 @@ const index = async(req, res) => {
  */
 const show = async(req, res) => {
 
-    const album = await new models.Album({ id: req.params.albumId, user_id: req.user.id }).fetch({ require: false, withRelated: ['photos'] });
+    const album = await new models.Album({ id: req.params.albumId, user_id: req.user.id })
+        .fetch({ require: false, withRelated: ['photos'] });
 
     // make sure album exists
     if (!album) {
@@ -130,10 +132,10 @@ const addPhoto = async(req, res) => {
 
     const album = await new models.Album({ id: req.params.albumId, user_id: req.user.id }).fetch({ require: false });
     await album.load('photos');
+    const photos_in_album = album.related('photos')
 
     await req.user.load('photos');
-    const photos = req.user.related('photos');
-
+    const users_photos = req.user.related('photos');
 
     if (!album) {
         debug("Album to update was not found.");
@@ -145,12 +147,12 @@ const addPhoto = async(req, res) => {
     }
 
     const validData = matchedData(req);
-    var check = false;
+    let check = false;
 
     // make sure photos are avialiable for this user
 
     validData.photo_id.forEach(async element => {
-        const photo = photos.find(photo => photo.id == element);
+        const photo = users_photos.find(photo => photo.id == element);
         if (!photo) {
             check = true;
             return;
@@ -158,7 +160,7 @@ const addPhoto = async(req, res) => {
     })
 
     if (check) {
-        debug("User has no rights to attach these photos");
+        debug("User has no rights to attach one of these photos");
         res.status(403).send({
             status: 'fail',
             data: "Not permitted to attach these photos",
@@ -169,8 +171,8 @@ const addPhoto = async(req, res) => {
     // make sure this album does not already have these photos
 
     validData.photo_id.forEach(async element => {
-        const photo_in_album = album.related('photos').find(photo => photo.id == element);
-        if (photo_in_album) {
+        const photo = photos_in_album.find(photo => photo.id == element);
+        if (photo) {
             check = true;
             return;
         }
@@ -179,7 +181,7 @@ const addPhoto = async(req, res) => {
     if (check) {
         res.status(403).send({
             status: 'fail',
-            data: 'Photos already exist in album',
+            data: 'One of the photos already exist in album',
         });
         return;
     }

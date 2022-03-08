@@ -1,55 +1,35 @@
-const bcrypt = require('bcrypt');
 const debug = require('debug')('photo_app:auth');
 const { User } = require('../models');
+const jwt = require('jsonwebtoken');
 
-const basic = async(req, res, next) => {
-
+const validateJwtToken = async(req, res, next) => {
     if (!req.headers.authorization) {
-        debug("Authorization header missing");
-
         return res.status(401).send({
             status: 'fail',
-            data: 'Authorization required',
+            data: 'Authorization failed 1',
         });
     }
 
-    const [authSchema, base64Payload] = req.headers.authorization.split(' ');
-
-    if (authSchema.toLowerCase() !== "basic") {
-        debug("Authorization schema isn't basic");
-
+    const [authSchema, token] = req.headers.authorization.split(' ');
+    if (authSchema.toLowerCase() !== "bearer") {
         return res.status(401).send({
             status: 'fail',
-            data: 'Authorization required',
+            data: 'Authorization failed 2',
         });
     }
 
-    const decodedPayload = Buffer.from(base64Payload, 'base64').toString('ascii');
-
-    const [email, password] = decodedPayload.split(':');
-
-    const user = await new User({ email }).fetch({ require: false });
-    if (!user) {
+    try {
+        req.user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    } catch (error) {
         return res.status(401).send({
             status: 'fail',
-            data: 'Authorization failed',
+            data: 'Authorization failed 3',
         });
     }
-    const hash = user.get('password');
-
-    const result = await bcrypt.compare(password, hash);
-    if (!result) {
-        return res.status(401).send({
-            status: 'fail',
-            data: 'Authorization failed',
-        });
-    }
-
-    req.user = user;
-
+    req.user = await new User({ id: req.user.id }).fetch();
     next();
 }
 
 module.exports = {
-    basic,
+    validateJwtToken
 }

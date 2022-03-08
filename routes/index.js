@@ -11,8 +11,11 @@ router.get('/', (req, res) => {
     });
 });
 
-router.use('/albums', auth.basic, require('./albums'));
-router.use('/photos', auth.basic, require('./photos'));
+router.post('/login', authController.login);
+router.post('/refresh', authController.refresh);
+
+router.use('/albums', auth.validateJwtToken, require('./albums'));
+router.use('/photos', auth.validateJwtToken, require('./photos'));
 
 router.post('/register', userValidationRules.createRules, authController.register);
 

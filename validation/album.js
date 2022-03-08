@@ -19,7 +19,6 @@ const albumValidationRules = [
 const addPhotoRules = [
     body('photo_id').exists().isArray(),
     check('photo_id.*').isInt()
-
 ]
 
 module.exports = { albumValidationRules, addPhotoRules };
