@@ -7,6 +7,9 @@ const models = require('../models');
  *
  * GET /
  */
+
+// password to all users: password_example
+
 const index = async(req, res) => {
 
     await req.user.load('albums');
@@ -28,12 +31,12 @@ const show = async(req, res) => {
     const album = await new models.Album({ id: req.params.albumId, user_id: req.user.id })
         .fetch({ require: false, withRelated: ['photos'] });
 
-    // make sure album exists
+    // make sure album exists for his user
     if (!album) {
         debug("Album was not found.");
         res.status(404).send({
             status: 'fail',
-            data: 'Album Not Found',
+            data: 'Album Not Found or access denied',
         });
         return;
     }
@@ -86,13 +89,15 @@ const store = async(req, res) => {
  */
 const update = async(req, res) => {
 
-    // make sure album exists
+
     const album = await new models.Album({ id: req.params.albumId, user_id: req.user.id }).fetch({ require: false });
+
+    // make sure album exists for this user
     if (!album) {
-        debug("Album to update was not found.");
+        debug("Album to update was not found or user has no rights to update album.");
         res.status(404).send({
             status: 'fail',
-            data: 'Album Not Found',
+            data: 'Album not found or access denied',
         });
         return;
     }
@@ -128,23 +133,23 @@ const addPhoto = async(req, res) => {
         return res.status(422).send({ status: 'fail', data: errors.array() });
     }
 
-    // make sure album exists for this user
-
     const album = await new models.Album({ id: req.params.albumId, user_id: req.user.id }).fetch({ require: false });
+
+    // make sure album exists for this user
+    if (!album) {
+        debug("Album to update was not found.");
+        res.status(404).send({
+            status: 'fail',
+            data: 'Album not found or access denied',
+        });
+        return;
+    }
+
     await album.load('photos');
     const photos_in_album = album.related('photos')
 
     await req.user.load('photos');
     const users_photos = req.user.related('photos');
-
-    if (!album) {
-        debug("Album to update was not found.");
-        res.status(404).send({
-            status: 'fail',
-            data: 'Album Not Found',
-        });
-        return;
-    }
 
     const validData = matchedData(req);
     let check = false;
@@ -190,7 +195,6 @@ const addPhoto = async(req, res) => {
 
         album.photos().attach(validData.photo_id);
         debug("New photos were succsessfully added to album");
-
         res.send({
             status: 'success',
             data: null,
@@ -215,7 +219,17 @@ const deletePhoto = async(req, res) => {
             debug("Album to update was not found.");
             res.status(404).send({
                 status: 'fail',
-                data: 'Album Not Found',
+                data: 'Album not found or access denied',
+            });
+            return;
+        }
+
+        let photo_in_album = album.related('photos').find(photo => req.params.photoId == photo.id);
+
+        if (!photo_in_album) {
+            res.status(403).send({
+                status: 'fail',
+                data: 'Photo was not found',
             });
             return;
         }
@@ -248,10 +262,10 @@ const destroy = async(req, res) => {
         let album = await new models.Album({ id: req.params.albumId, user_id: req.user.id })
             .fetch({ require: false, withRelated: ['photos'] });
         if (!album) {
-            debug("Album to update was not found.");
+            debug("Album to update was not found or access denied.");
             res.status(404).send({
                 status: 'fail',
-                data: 'Album Not Found',
+                data: 'Album not found or access denied',
             });
             return;
         }

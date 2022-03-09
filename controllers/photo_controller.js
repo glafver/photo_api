@@ -8,6 +8,9 @@ const models = require('../models');
  *
  * GET /
  */
+
+// password to all users: password_example
+
 const index = async(req, res) => {
     await req.user.load('photos');
 
@@ -33,7 +36,7 @@ const show = async(req, res) => {
         debug("Photo was not found.");
         res.status(404).send({
             status: 'fail',
-            data: 'Photo Not Found',
+            data: 'Photo not found or access denied',
         });
         return;
     }
@@ -91,7 +94,7 @@ const update = async(req, res) => {
         debug("Photo to update was not found.");
         res.status(404).send({
             status: 'fail',
-            data: 'Photo Not Found',
+            data: 'Photo not found or access denied',
         });
         return;
     }
@@ -136,7 +139,7 @@ const destroy = async(req, res) => {
             debug("Photo to update was not found.");
             res.status(404).send({
                 status: 'fail',
-                data: 'Photo Not Found',
+                data: 'Photo not found or access denied',
             });
             return;
         }

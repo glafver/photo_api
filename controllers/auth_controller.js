@@ -61,7 +61,7 @@ const login = async(req, res) => {
     if (!user) {
         return res.status(401).send({
             status: 'fail',
-            data: 'Authentication failed.',
+            data: 'Authentication failed when login.',
         });
     }
 
