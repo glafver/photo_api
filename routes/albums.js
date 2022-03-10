@@ -14,7 +14,9 @@ router.put('/:albumId', albumValidationRules.albumValidationRules, albumControll
 
 router.post('/:albumId/photos', albumValidationRules.addPhotoRules, albumController.addPhoto);
 
-// router.delete('/:albumId', albumController.destroy);
+router.delete('/:albumId/photos/:photoId', albumController.deletePhoto);
+
+router.delete('/:albumId', albumController.destroy);
 
 
 module.exports = router;

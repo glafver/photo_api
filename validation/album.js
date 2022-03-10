@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+const { body, check } = require('express-validator');
 const models = require('../models');
 
 // title string required must be at least 3 chars long
@@ -10,7 +10,6 @@ const albumValidationRules = [
         if (title) {
             return Promise.reject("Title already exists.");
         }
-
         return Promise.resolve();
     }),
 ];
@@ -18,7 +17,8 @@ const albumValidationRules = [
 // photo_id integer required must be an existing photo id
 
 const addPhotoRules = [
-    body('photo_id').exists().isInt({ min: 1 })
-];
+    body('photo_id').exists().isArray(),
+    check('photo_id.*').isInt()
+]
 
 module.exports = { albumValidationRules, addPhotoRules };

@@ -2,35 +2,7 @@ const debug = require('debug')('photo_app:auth_controller');
 const { matchedData, validationResult } = require('express-validator');
 const models = require('../models');
 const bcrypt = require('bcrypt');
-
-// /**
-//  * Get all users
-//  *
-//  * GET /
-//  */
-// const index = async(req, res) => {
-//     const users = await models.User.fetchAll();
-
-//     res.send({
-//         status: 'success',
-//         data: users,
-//     });
-// }
-
-// /**
-//  * Get a specific user
-//  *
-//  * GET /:userId
-//  */
-// const show = async(req, res) => {
-//     const user = await new models.User({ id: req.params.userId })
-//         .fetch({ withRelated: ['albums', 'photos'] });
-
-//     res.send({
-//         status: 'success',
-//         data: user,
-//     });
-// }
+const jwt = require('jsonwebtoken');
 
 
 /**
@@ -40,16 +12,14 @@ const bcrypt = require('bcrypt');
  */
 
 const register = async(req, res) => {
-    // check for any validation errors
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).send({ status: 'fail', data: errors.array() });
     }
 
-    // get only the validated data from the request
     const validData = matchedData(req);
 
-    // generate a hash of `validData.password` and overwrite `validData.password` with the generated hash
     try {
         validData.password = await bcrypt.hash(validData.password, models.User.hashSaltRounds);
 
@@ -79,8 +49,78 @@ const register = async(req, res) => {
     }
 }
 
+/**
+ * Login a user, sign a JWT token and return it
+ *
+ * POST /login
+ */
+const login = async(req, res) => {
+    const { email, password } = req.body;
 
+    const user = await models.User.login(email, password);
+    if (!user) {
+        return res.status(401).send({
+            status: 'fail',
+            data: 'Authentication failed when login.',
+        });
+    }
+
+    const payload = {
+        email: user.get('email'),
+        id: user.get('id'),
+    }
+
+    const access_token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: process.env.ACCESS_TOKEN_LIFETIME || '1h',
+    });
+
+    const refresh_token = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
+        expiresIn: process.env.REFRESH_TOKEN_LIFETIME || '2h',
+    });
+
+    return res.send({
+        status: 'success',
+        data: {
+            access_token,
+            refresh_token,
+        }
+    });
+}
+
+/**
+ * Validate refresh token and issue a new access token
+ *
+ * POST /refresh
+ */
+const refresh = (req, res) => {
+    try {
+        const payload = jwt.verify(req.body.token, process.env.REFRESH_TOKEN_SECRET);
+
+        delete payload.iat;
+        delete payload.exp;
+
+        const access_token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+            expiresIn: process.env.ACCESS_TOKEN_LIFETIME || '1h',
+        });
+
+        return res.send({
+            status: 'success',
+            data: {
+                access_token,
+            }
+        });
+
+    } catch (error) {
+        return res.status(401).send({
+            status: 'fail',
+            data: 'Invalid token',
+        });
+    }
+
+}
 
 module.exports = {
-    register
+    register,
+    login,
+    refresh
 }

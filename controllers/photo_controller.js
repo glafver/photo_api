@@ -1,5 +1,6 @@
 const debug = require('debug')('photo_app:photo_controller');
 const { matchedData, validationResult } = require('express-validator');
+const { Photo } = require('../models');
 const models = require('../models');
 
 /**
@@ -7,6 +8,9 @@ const models = require('../models');
  *
  * GET /
  */
+
+// password to all users: password_example
+
 const index = async(req, res) => {
     await req.user.load('photos');
 
@@ -24,15 +28,14 @@ const index = async(req, res) => {
  */
 const show = async(req, res) => {
 
-    // make sure photo exists and it belongs to the user
-
-    const photo = await new models.Photo({ id: req.params.photoId, user_id: req.user.id }).fetch({ require: false });
+    const photo = await new models.Photo({ id: req.params.photoId, user_id: req.user.id })
+        .fetch({ require: false });
 
     if (!photo) {
         debug("Photo was not found.");
         res.status(404).send({
             status: 'fail',
-            data: 'Photo Not Found',
+            data: 'Photo not found or access denied',
         });
         return;
     }
@@ -83,13 +86,14 @@ const store = async(req, res) => {
  */
 const update = async(req, res) => {
 
-    // make sure photo exists and it belongs to the user
-    const photo = await new models.Photo({ id: req.params.photoId, user_id: req.user.id }).fetch({ require: false });
+    // make sure photo exists
+    const photo = await new models.Photo({ id: req.params.photoId, user_id: req.user.id })
+        .fetch({ require: false });
     if (!photo) {
         debug("Photo to update was not found.");
         res.status(404).send({
             status: 'fail',
-            data: 'Photo Not Found',
+            data: 'Photo not found or access denied',
         });
         return;
     }
@@ -119,10 +123,49 @@ const update = async(req, res) => {
     }
 }
 
+/**
+ * Destroy a specific resource
+ *
+ * DELETE /:photoId
+ */
+
+const destroy = async(req, res) => {
+
+    try {
+        let photo = await new models.Photo({ id: req.params.photoId, user_id: req.user.id })
+            .fetch({ require: false, withRelated: ['albums'] });
+        if (!photo) {
+            debug("Photo to update was not found.");
+            res.status(404).send({
+                status: 'fail',
+                data: 'Photo not found or access denied',
+            });
+            return;
+        }
+
+        photo.albums().detach();
+
+        photo = await photo.destroy();
+
+        return res.status(200).send({
+            status: 'success',
+            data: null
+        });
+
+    } catch (err) {
+        debug(err)
+        return res.status(500).send({
+            status: 'error',
+            data: 'Exception thrown in database when deleting a photo.',
+        });
+    }
+}
+
 
 module.exports = {
     index,
     show,
     store,
     update,
+    destroy
 }

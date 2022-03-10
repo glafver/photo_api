@@ -12,5 +12,7 @@ router.post('/', photoValidationRules.createRules, photoController.store);
 
 router.put('/:photoId', photoValidationRules.updateRules, photoController.update);
 
+router.delete('/:photoId', photoController.destroy);
+
 
 module.exports = router;
