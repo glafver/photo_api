@@ -1,0 +1,482 @@
+{
+	"info": {
+		"_postman_id": "5a544d91-0a20-4ed1-967a-f3ee61b6a583",
+		"name": "photo_app - HEROKU - VG",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "http://localhost:3000/register",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"jn@badcameraphotography.com\",\r\n  \"password\": \"omg-smile\",\r\n  \"first_name\": \"Johan\",\r\n  \"last_name\": \"Nordström\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://desolate-ridge-68464.herokuapp.com/register",
+							"protocol": "https",
+							"host": [
+								"desolate-ridge-68464",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/login",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"jn@badcameraphotography.com\",\r\n  \"password\": \"omg-smile\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://desolate-ridge-68464.herokuapp.com/login",
+							"protocol": "https",
+							"host": [
+								"desolate-ridge-68464",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/refresh",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"token\": }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://desolate-ridge-68464.herokuapp.com/refresh",
+							"protocol": "https",
+							"host": [
+								"desolate-ridge-68464",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Albums",
+			"item": [
+				{
+					"name": "http://localhost:3000/albums/",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://desolate-ridge-68464.herokuapp.com/albums/",
+							"protocol": "https",
+							"host": [
+								"desolate-ridge-68464",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"albums",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/albums/1",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://desolate-ridge-68464.herokuapp.com/albums/11",
+							"protocol": "https",
+							"host": [
+								"desolate-ridge-68464",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"albums",
+								"11"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/albums - POST",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Confetti Album\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://desolate-ridge-68464.herokuapp.com/albums",
+							"protocol": "https",
+							"host": [
+								"desolate-ridge-68464",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"albums"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/albums/1 - PUT",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Confetti'R'Us\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://desolate-ridge-68464.herokuapp.com/albums/11",
+							"protocol": "https",
+							"host": [
+								"desolate-ridge-68464",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"albums",
+								"11"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/albums - POST PHOTO",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"photo_id\": [11, 12]}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://desolate-ridge-68464.herokuapp.com/albums/11/photos",
+							"protocol": "https",
+							"host": [
+								"desolate-ridge-68464",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"albums",
+								"11",
+								"photos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/albums/1 - DELETE",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://desolate-ridge-68464.herokuapp.com/albums/10",
+							"protocol": "https",
+							"host": [
+								"desolate-ridge-68464",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"albums",
+								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/albums/1 - DELETE PHOTO",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://desolate-ridge-68464.herokuapp.com/albums/11/photos/11",
+							"protocol": "https",
+							"host": [
+								"desolate-ridge-68464",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"albums",
+								"11",
+								"photos",
+								"11"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Photos",
+			"item": [
+				{
+					"name": "http://localhost:3000/photos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/photos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"photos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/photos/1",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/photos/11",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"photos",
+								"11"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/photos - POST",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Confetti Photo #1\",\r\n  \"url\": \"https://images.unsplash.com/photo-1492684223066-81342ee5ff30\",\r\n  \"comment\": \"Confetti\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/photos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"photos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/photos/1 - PUT",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"When life gives you confetti, celebrate\",\r\n  \"comment\": \"Yolo\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/photos/11",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"photos",
+								"11"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/photos/1 -DELETE",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/photos/11",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"photos",
+								"11"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "http://localhost:3000/ - INDEX",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://desolate-ridge-68464.herokuapp.com",
+					"protocol": "https",
+					"host": [
+						"desolate-ridge-68464",
+						"herokuapp",
+						"com"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGV4YW1wbGUuY29tIiwiaWQiOjEsImlhdCI6MTY0NjkxNjQyMSwiZXhwIjoxNjQ2OTIwMDIxfQ.fM4jO3DM5jO09jV89wyIkY3YjtBiraVQYjD99j0VWGk",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
