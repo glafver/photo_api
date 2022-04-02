@@ -93,8 +93,25 @@ const login = async(req, res) => {
  * POST /refresh
  */
 const refresh = (req, res) => {
+
+    if (!req.headers.authorization) {
+        return res.status(401).send({
+            status: 'fail',
+            data: 'Authorization failed 1',
+        });
+    }
+
+    const [authSchema, token] = req.headers.authorization.split(' ');
+
+    if (authSchema.toLowerCase() !== "bearer") {
+        return res.status(401).send({
+            status: 'fail',
+            data: 'Authorization failed 2',
+        });
+    }
+
     try {
-        const payload = jwt.verify(req.body.token, process.env.REFRESH_TOKEN_SECRET);
+        const payload = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
 
         delete payload.iat;
         delete payload.exp;
