@@ -7,7 +7,7 @@ const auth = require('../middlewares/auth');
 router.get('/', (req, res) => {
     res.send({
         status: 'success',
-        message: 'Hello from a photo app! You need to create an account or log in to get started.'
+        message: 'Hello from my photo app! You need to create an account or log in to get started.'
     });
 });
 
