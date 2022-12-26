@@ -1,25 +1,9 @@
 REST API with mySQL-database which will be a backend for future foto-app
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
+
+
+
+
+
 # Photo API endpoints
 
 - All passwords **must** be salted and hashed.
